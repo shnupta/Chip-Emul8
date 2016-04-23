@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cpu.h"
-#include "opcodes.h"
 
 chip8 cpu;
 
@@ -12,18 +11,13 @@ int main(int argc, char const *argv[])
 	initialise_cpu(cpu); //TODO
 	load_rom(cpu, "PONG"); //TODO
 
+	//emulate_cycle(cpu);
 
-	/*
-	//emulation loop
-	for(;;) {
+	
+	/*emulation loop
+	for(int i = 0; i < 4; i++) {
 		emulate_cycle(cpu); //TODO
 
-		if(draw_flag(cpu)) { //TODO
-			draw_graphics(); //TODO
-		}
-
-
-		set_keys(cpu); //TODO
 	}*/
 
 	return 0;
