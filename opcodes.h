@@ -14,6 +14,9 @@ void decode_opcode(chip8 cpu);
 void clear_screen(chip8 cpu);
 
 void decode_opcode(chip8 cpu) {
+
+	cpu.opcode = (cpu.memory[cpu.pc] << 8 | cpu.memory[cpu.pc + 1]);
+
 	switch(cpu.opcode & 0xF000) {
 		case 0x0000:
 			switch(cpu.opcode & 0x00FF) {

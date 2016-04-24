@@ -2,9 +2,10 @@
 #define _CPU_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
-	unsigned short opcode; //an opcode is two bytes
+	uint16_t opcode; //an opcode is two bytes
 
 	bool is_running;
 	bool render_flag;

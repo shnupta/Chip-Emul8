@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
 	initialise_cpu(cpu); //TODO
 	load_rom(cpu, "PONG"); //TODO
 
-	//emulate_cycle(cpu);
+	emulate_cycle(cpu);
 
 	
 	/*emulation loop

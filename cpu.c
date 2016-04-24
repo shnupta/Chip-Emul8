@@ -101,7 +101,7 @@ void load_rom(chip8 cpu, char *rom_name) {
 
 	for(int i = 0; i < file_len; i++) {
 		cpu.memory[i + 512] = buffer[i];
-		printf("%04x\n", buffer[i]);
+		//printf("%04x\n", cpu.memory[i + 512] & 0xF000);
 	}
 
 	free(buffer);
@@ -111,7 +111,6 @@ void load_rom(chip8 cpu, char *rom_name) {
 
 void emulate_cycle(chip8 cpu) {
 	//fetch opcode
-	cpu.opcode = cpu.memory[cpu.pc] << 8 | cpu.memory[cpu.pc +1];
 
 	//decode opcode
 	decode_opcode(cpu);
