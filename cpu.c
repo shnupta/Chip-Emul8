@@ -43,79 +43,61 @@ static int key_map[0x10] = {
     SDLK_f
 };
 
-void initialise_cpu(chip8 cpu) {
-	memset(cpu.memory, 0, 4096); //reset memory
-	memset(cpu.V, 0, 16); //reset registers
-	memset(cpu.stack, 0, 16); //reset stack
-	memset(cpu.key, 0, 16); //reset keys
+void initialise_cpu(chip8 * cpu) {
+	memset(cpu->memory, 0, 4096); //reset memory
+	memset(cpu->V, 0, 16); //reset registers
+	memset(cpu->stack, 0, 16); //reset stack
+	memset(cpu->key, 0, 16); //reset keys
 	//defaults
-	cpu.I = 0;
-	cpu.pc = 0x200;
-	cpu.sp = 0;
-	cpu.delay_timer = 0;
-	cpu.sound_timer = 0;
-	cpu.opcode = 0;
+	cpu->I = 0;
+	cpu->pc = 0x200;
+	cpu->sp = 0;
+	cpu->delay_timer = 0;
+	cpu->sound_timer = 0;
+	cpu->opcode = 0;
 
 	// load fonts
 	for (int i = 0; i < 80; i++) {
-		cpu.memory[i] = font_set[i];
+		cpu->memory[i] = font_set[i];
 	}
 
-	memset(cpu.gfx, 0, 64 * 32); //reset screen
+	memset(cpu->gfx, 0, 64 * 32); //reset screen
 
 }
 
 
-void load_rom(chip8 cpu, char *rom_name) {
-	FILE *file;
-	char *buffer;
-	unsigned long file_len;
-
-	//Open file
-	file = fopen(rom_name, "rb");
-	if (!file)
-	{
-		log_err("Unable to open file %s", rom_name);
-		return;
+bool load_rom(chip8 * cpu, const char *rom_name) {
+	FILE * file = fopen(rom_name, "rb"); //open file in binary mode
+	if(!file) {
+		log_err("File does not exist.");
+		return false;
 	}
-	
-	//Get file length
+
 	fseek(file, 0, SEEK_END);
-	file_len=ftell(file);
-	fseek(file, 0, SEEK_SET);
+	unsigned long buffer_size = ftell(file);
+	rewind(file);
 
-	//Allocate memory
-	buffer=(char *)malloc(file_len+1);
-	if (!buffer)
-	{
-		fprintf(stderr, "Memory error!");
-                                fclose(file);
-		return;
+	log_info("Read %lu bytes from %s.", buffer_size, rom_name);
+
+	char *buffer = (char *) malloc((buffer_size + 1) * sizeof(char)); //allocate memory for buffer
+	fread(buffer, buffer_size, 1, file);
+
+	for(int i = 0; i < buffer_size; i++) {
+		cpu->memory[512 + i] = buffer[i];
 	}
 
-	//Read file contents into buffer
-	fread(buffer, file_len, 1, file);
-	fclose(file);
-
-
-
-	for(int i = 0; i < file_len; i++) {
-		cpu.memory[i + 512] = buffer[i];
-		//printf("%04x\n", cpu.memory[i + 512] & 0xF000);
-	}
-
-	free(buffer);
-
+	return true;
+	
 }
 
 
-void emulate_cycle(chip8 cpu) {
+void emulate_cycle(chip8 * cpu) {
 	//fetch opcode
-
-	//decode opcode
+	cpu->opcode = cpu->memory[cpu->pc] << 8 | cpu->memory[cpu->pc + 1];
+	
 	decode_opcode(cpu);
-}
 
+}
 
 
 

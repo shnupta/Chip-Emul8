@@ -8,17 +8,12 @@ int main(int argc, char const *argv[])
 {
 	// TODO: implement OpenGL graphics and input
 
-	initialise_cpu(cpu); //TODO
-	load_rom(cpu, "PONG"); //TODO
+	initialise_cpu(&cpu);
+	load_rom(&cpu, "PONG");
 
-	emulate_cycle(cpu);
-
-	
-	/*emulation loop
-	for(int i = 0; i < 4; i++) {
-		emulate_cycle(cpu); //TODO
-
-	}*/
+	for(;;) {
+		emulate_cycle(&cpu);
+	}
 
 	return 0;
 }

@@ -13,22 +13,22 @@ typedef struct {
 	bool wait_for_key;
 	bool key_location;
 
-	unsigned char memory[4096]; //has 4K memory
+	uint8_t memory[4096]; //has 4K memory
 
-	unsigned char V[16]; //general purpose regsters
+	uint8_t V[16]; //general purpose regsters
 
-	unsigned short I; //index register
-	unsigned short pc; //program counter
+	uint16_t I; //index register
+	uint16_t pc; //program counter
 
-	unsigned char gfx[64 * 32]; //pixels of screen
+	uint8_t gfx[64 * 32]; //pixels of screen
 
-	unsigned char delay_timer;
-	unsigned char sound_timer;
+	uint8_t delay_timer;
+	uint8_t sound_timer;
 
-	unsigned short stack[16];
-	unsigned short sp;
+	uint16_t stack[16];
+	uint16_t sp;
 
-	unsigned char key[16]; //hex keypad
+	uint8_t key[16]; //hex keypad
 
 } chip8;
 
@@ -37,8 +37,8 @@ typedef struct {
 //0x200-0xFFF - Program ROM and work RAM
 
 
-void initialise_cpu(chip8 cpu);
-void load_rom(chip8 cpu, char *name);
-void emulate_cycle(chip8 cpu);
+void initialise_cpu(chip8 * cpu);
+bool load_rom(chip8 * cpu, const char *name);
+void emulate_cycle(chip8 * cpu);
 
 #endif
