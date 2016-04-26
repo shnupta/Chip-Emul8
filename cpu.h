@@ -7,15 +7,9 @@
 typedef struct {
 	uint16_t opcode; //an opcode is two bytes
 
-	bool is_running;
-	bool render_flag;
-
-	bool wait_for_key;
-	bool key_location;
-
 	uint8_t memory[4096]; //has 4K memory
 
-	uint8_t V[16]; //general purpose regsters
+	uint8_t V[16]; //general purpose regsters, VF doubles as a a carry flag
 
 	uint16_t I; //index register
 	uint16_t pc; //program counter
@@ -40,5 +34,6 @@ typedef struct {
 void initialise_cpu(chip8 * cpu);
 bool load_rom(chip8 * cpu, const char *name);
 void emulate_cycle(chip8 * cpu);
+void clear_screen(chip8 *cpu);
 
 #endif

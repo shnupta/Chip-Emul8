@@ -61,7 +61,7 @@ void initialise_cpu(chip8 * cpu) {
 		cpu->memory[i] = font_set[i];
 	}
 
-	memset(cpu->gfx, 0, 64 * 32); //reset screen
+	clear_screen(cpu);
 
 }
 
@@ -98,6 +98,13 @@ void emulate_cycle(chip8 * cpu) {
 	decode_opcode(cpu);
 
 }
+
+void clear_screen(chip8 * cpu) {
+	memset(cpu->gfx, 0, 64 * 32);
+
+}
+
+
 
 
 

@@ -11,9 +11,12 @@ int main(int argc, char const *argv[])
 	initialise_cpu(&cpu);
 	load_rom(&cpu, "PONG");
 
+	emulate_cycle(&cpu);
+
+	/*
 	for(;;) {
 		emulate_cycle(&cpu);
-	}
+	}*/
 
 	return 0;
 }
