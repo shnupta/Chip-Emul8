@@ -16,22 +16,24 @@ void decode_opcode(chip8 * cpu);
 
 void decode_opcode(chip8 * cpu) {
 	switch(cpu->opcode & 0xF000) {
-		switch(cpu->opcode & 0x000F) {
-			case 0x00E0: //00E0: CLS - clear the display
-				clear_screen(cpu);
-				cpu->pc += 2;
-			break;
+		case 0x000: //0nnn
+			switch(cpu->opcode & 0x000F) {
+				case 0x00E0: //00E0: CLS - clear the display
+					clear_screen(cpu);
+					cpu->pc += 2;
+				break;
 
-			case 0x00EE: //00EE: RET - return from a subroutine, sets PC = stack[sp] then sp--
-				cpu->pc = cpu->stack[cpu->sp];
-				--cpu->sp;
-				cpu->pc += 2;
-			break;
+				case 0x00EE: //00EE: RET - return from a subroutine, sets PC = stack[sp] then sp--
+					cpu->pc = cpu->stack[cpu->sp];
+					--cpu->sp;
+					cpu->pc += 2;
+				break;
 
-			default:
-				log_err("Unknown opcde: %X", cpu->opcode);
+				default:
+					log_err("Unknown opcde: %X", cpu->opcode);
 
-			}
+				}
+		break;
 
 		case 0x1000: //1nnn: JP addr - jump to location nnn
 			cpu->pc = NNN(cpu->opcode);
