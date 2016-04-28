@@ -24,6 +24,8 @@ typedef struct {
 
 	uint8_t key[16]; //hex keypad
 
+	bool draw_flag;
+
 } chip8;
 
 //0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
@@ -35,5 +37,6 @@ void initialise_cpu(chip8 * cpu);
 bool load_rom(chip8 * cpu, const char *name);
 void emulate_cycle(chip8 * cpu);
 void clear_screen(chip8 *cpu);
+void update_timers(chip8 * cpu);
 
 #endif

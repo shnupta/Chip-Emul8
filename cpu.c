@@ -3,6 +3,7 @@
 #include "opcodes.h"
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 unsigned char font_set[80] =
 {
@@ -63,6 +64,8 @@ void initialise_cpu(chip8 * cpu) {
 
 	clear_screen(cpu);
 
+	srand(time(NULL)); //reset random seed
+
 }
 
 
@@ -97,11 +100,28 @@ void emulate_cycle(chip8 * cpu) {
 	
 	decode_opcode(cpu);
 
+	update_timers(cpu);
+
 }
 
 void clear_screen(chip8 * cpu) {
 	memset(cpu->gfx, 0, 64 * 32);
 
+	cpu->draw_flag = true;
+
+}
+
+void update_timers(chip8 * cpu) {
+	if(cpu->delay_timer > 0) {
+		--cpu->delay_timer;
+	}
+
+	if(cpu->sound_timer > 0) {
+		if(cpu->sound_timer == 1) {
+			printf("BEEP\n");
+			--cpu->sound_timer;
+		}
+	}
 }
 
 
