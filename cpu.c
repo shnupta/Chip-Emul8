@@ -25,23 +25,23 @@ unsigned char font_set[80] =
   0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-static int key_map[0x10] = {
-    SDLK_0,
-    SDLK_1,
-    SDLK_2,
-    SDLK_3,
-    SDLK_4,
-    SDLK_5,
-    SDLK_6,
-    SDLK_7,
-    SDLK_8,
-    SDLK_9,
-    SDLK_a,
-    SDLK_b,
-    SDLK_c,
-    SDLK_d,
-    SDLK_e,
-    SDLK_f
+unsigned char key_map[16] = {
+    SDL_SCANCODE_1,
+    SDL_SCANCODE_2,
+    SDL_SCANCODE_3,
+    SDL_SCANCODE_4,
+    SDL_SCANCODE_Q,
+    SDL_SCANCODE_W,
+    SDL_SCANCODE_E,
+    SDL_SCANCODE_R,
+    SDL_SCANCODE_A,
+    SDL_SCANCODE_S,
+    SDL_SCANCODE_D,
+    SDL_SCANCODE_F,
+    SDL_SCANCODE_Z,
+    SDL_SCANCODE_X,
+    SDL_SCANCODE_C,
+    SDL_SCANCODE_V
 };
 
 void initialise_cpu(chip8 * cpu) {

@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -L/usr/local/lib -lSDL2
 
 all: main
 

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <SDL2/SDL.h>
 
 typedef struct {
 	uint16_t opcode; //an opcode is two bytes

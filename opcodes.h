@@ -1,7 +1,7 @@
 #ifndef _opcodes_h
 #define _opcodes_h
-#include <SDL2/SDL.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 //instructions site: http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#00E0
 
