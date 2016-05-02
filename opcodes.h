@@ -17,21 +17,24 @@ void decode_opcode(chip8 * cpu);
 void decode_opcode(chip8 * cpu) {
 	switch(cpu->opcode & 0xF000) {
 		case 0x0000: //0nnn
-			switch(cpu->opcode & 0x000F) {
+			switch(cpu->opcode) {
 				case 0x00E0: //00E0: CLS - clear the display
 					clear_screen(cpu);
 					cpu->pc += 2;
 				break;
 
-				case 0x000E: //00EE: RET - return from a subroutine, sets PC = stack[sp] then sp--
+				case 0x00EE: //00EE: RET - return from a subroutine, sets PC = stack[sp] then sp--
+					cpu->sp -= 1;
 					cpu->pc = cpu->stack[cpu->sp];
-					--cpu->sp;
 					cpu->pc += 2;
+
+					
 				break;
 
 				default:
 					log_err("Unknown opcode: %X", cpu->opcode);
-					exit(1);
+					cpu->pc += 2;
+					break;
 
 				}
 		break;
@@ -42,14 +45,10 @@ void decode_opcode(chip8 * cpu) {
 
 		case 0x2000: //2nnn: CALL addr - call subroutine at nnn
 			//add error checking to prevent stck overflow
-			if((cpu->sp + 1) >= sizeof(cpu->stack)) {
-				log_err("Stack overflow exiting...");
-				exit(1);
-				break;
-			}	
-
-			cpu->sp++;
+			
+			
 			cpu->stack[cpu->sp] = cpu->pc;
+			cpu->sp += 1;
 			cpu->pc = NNN(cpu->opcode);
 		break;
 
@@ -108,22 +107,26 @@ void decode_opcode(chip8 * cpu) {
 					cpu->V[0xF] = result > 255 ? 1 : 0; //VF is doubled as a carry flag register
 
 					//only the lower 8 bits are stored ad kept in Vx
-					cpu->V[X(cpu->opcode)] = result & 0xFF;
+					cpu->V[X(cpu->opcode)] = result &0xFF;
 
 					cpu->pc += 2;
 				}
 			break;
 
 			case 0x0005: //8XY5: SUB Vx, Vy - set Vx = Vx - Vy, set VF = NOT borrow
-			
-				cpu->V[0xF] = cpu->V[X(cpu->opcode)] > cpu->V[Y(cpu->opcode)] ? 1 : 0;
+			{
+				int vx = cpu->V[X(cpu->opcode)];
+                int vy = cpu->V[Y(cpu->opcode)];
 
-				cpu->V[X(cpu->opcode)] = cpu->V[X(cpu->opcode)] - cpu->V[Y(cpu->opcode)];
+                cpu->V[0xF] = vx < vy ? 0 : 1;
 
-				cpu->pc += 2;
+                cpu->V[X(cpu->opcode)] = vx -vy;
+
+                cpu->pc += 2;
+            }
 			break;
 			
-			//CHECK THIS INSTRUCTION
+			
 			case 0x0006: //8XY6: SHR Vx {, Vy} - Vx = Vx SHR 1.
 				cpu->V[0xF] = cpu->V[X(cpu->opcode)] & 0x01;
 				cpu->V[X(cpu->opcode)] >>= 1;
@@ -131,12 +134,19 @@ void decode_opcode(chip8 * cpu) {
 			break;
 
 			case 0x0007: //8XY7: SUBN Vx, Vy - set Vx = Vy - Vx, set VF NOT borrow
-				cpu->V[0xF] = cpu->V[Y(cpu->opcode)] > cpu->V[X(cpu->opcode)] ? 1 : 0;
-				cpu->V[X(cpu->opcode)] = cpu->V[Y(cpu->opcode)] - cpu->V[X(cpu->opcode)];
+			{
+				int vx = cpu->V[X(cpu->opcode)];
+				int vy = cpu->V[Y(cpu->opcode)];
+
+				cpu->V[0xF] = vx > vy ? 0 : 1;
+
+				cpu->V[X(cpu->opcode)] = vy - vx;
+
 				cpu->pc += 2;
+			}
 			break;
 
-			//CHECK THISINSTRUCTION
+			
 			case 0x000E: //8XYE: SHL Vx {, Vy} - set Vx = Vx SHL 1
 				cpu->V[0xF] = (cpu->V[X(cpu->opcode)] & 0x80) >> 7;
 				cpu->V[X(cpu->opcode)] <<= 1;
@@ -145,7 +155,7 @@ void decode_opcode(chip8 * cpu) {
 
 			default:
 				log_err("Unknown opcode: %X", cpu->opcode);
-				exit(1);
+				cpu->pc += 2;
 		}
 		break;	
 
@@ -169,31 +179,33 @@ void decode_opcode(chip8 * cpu) {
 
 		case 0xD000: //DXYN: DRW Vx, Vy, nibble - display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 		{
-			uint8_t vx = cpu->V[X(cpu->opcode)];
-			uint8_t vy = cpu->V[Y(cpu->opcode)];
+			int height = cpu->opcode &0x000F;
+			int x_coord = cpu->V[X(cpu->opcode)];
+			int y_coord = cpu->V[Y(cpu->opcode)];
+
+			// because the sprite is represented by hexadecimal numbers
+			// bitwise operators are necessary to obtain each pixel
+			int ands[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
 
 			cpu->V[0xF] = 0;
 
-			uint8_t pixel = 0;
+			for(int i = 0; i < height; i++) {
+				for(int j = 0; j < 8; j++) {
+					if(x_coord + j == 64) {
+						x_coord = -j;
+					}
+					if(y_coord + i == 32) {
+						y_coord = -i;
+					}
 
-			int w = 0;
-			int h = 0;
-
-			for (uint8_t yline = 0; yline < N(cpu->opcode); yline++) {
-				pixel = cpu->memory[cpu->I + yline];
-				for(uint8_t xline = 0; xline < 8; xline++) {
-					//make sure pixel is not drawn off the screen.
-					w = (vx + xline) > 64 ? 64 : vx + xline;
-					h = (vy + yline) > 32 ? 32 : vy + yline;
-
-					//collision checking 
-					if(cpu->gfx[(w + (h * 64))] == 1) {
+					if(cpu->gfx[x_coord + j][y_coord + i] == 1 && ((cpu->memory[cpu->I + i] & ands[j]) >> (8 - j - 1)) == 1) {
 						cpu->V[0xF] = 1;
 					}
 
-					cpu->gfx[(w + (h * 64))] ^= 1;
-
+					cpu->gfx[x_coord + j][y_coord + i] = cpu->gfx[x_coord + j][y_coord + i] ^ ((cpu->memory[cpu->I + i] & ands[j]) >> (8 - j - 1));
 				}
+				x_coord = cpu->V[X(cpu->opcode)];
+				y_coord = cpu->V[Y(cpu->opcode)];
 			}
 
 			cpu->draw_flag = true;
@@ -204,20 +216,11 @@ void decode_opcode(chip8 * cpu) {
 		case 0xE000:
 			switch(cpu->opcode & 0x00FF) {
 				case 0x009E: //EX9E: SKP Vx - skip next instruction if key with the value of Vx is pressed.
-					if(cpu->key[cpu->V[X(cpu->opcode)]] != 0) {
-						cpu->pc += 4;
-					} else {
-						cpu->pc += 2;
-					}
+					cpu->pc += cpu->key == cpu->V[X(cpu->opcode)] ? 4 : 2;
 				break;
 
 				case 0x00A1: //EXA1: SKNP Vx - Skip next instruction if key with the value of Vx is not pressed.
-					if(cpu->key[cpu->V[X(cpu->opcode)]] == 0) {
-						cpu->pc += 4;
-					} else {
-						cpu->pc += 2;
-					}
-
+					cpu->pc += cpu->key != cpu->V[X(cpu->opcode)] ? 4 : 2;
 				break;
 
 				default:
@@ -236,17 +239,11 @@ void decode_opcode(chip8 * cpu) {
 
 				case 0x000A: //Ld Vx, K - Wait for a key press, store the value of the key in Vx.
 				{	
-					bool key_press = false;
-
-					for (int i = 0; i < 16; i++) {
-						if(cpu->key[i] != 0) {
-							cpu->V[X(cpu->opcode)] = i;
-							key_press = true;
-						}
-					}
-
-					if(!key_press)
+					if(cpu->key == 0) {
 						return;
+					} else {
+						cpu->V[X(cpu->opcode)] = cpu->key;
+					}
 					cpu->pc += 2;
 				}
 				break;
@@ -262,6 +259,7 @@ void decode_opcode(chip8 * cpu) {
 				break;
 
 				case 0x001E: //FX1E: ADD I, Vx - set I = I + Vx
+				
 					cpu->I += cpu->V[X(cpu->opcode)];
 					cpu->pc += 2;
 				break;
@@ -273,24 +271,24 @@ void decode_opcode(chip8 * cpu) {
 
 				case 0x0033: //FX33: LD B, Vx - Store BCD representation of Vx in memory locations I, I+1, and I+2.
 					cpu->memory[cpu->I] = cpu->V[X(cpu->opcode)] / 100; //store the hundreds value of vx in memory location I
-					cpu->memory[cpu->I + 1] = (cpu->V[X(cpu->opcode)] % 100) / 10; //store the tens value of vx in memory location I + 1
+					cpu->memory[cpu->I + 1] = (cpu->V[X(cpu->opcode)] % 10) % 10; //store the tens value of vx in memory location I + 1
 					cpu->memory[cpu->I + 2] = cpu->V[X(cpu->opcode)] % 10; //store the units value of vx in memory location I + 2
 					cpu->pc += 2;
 				break;
 
 				case 0x0055: //FX55: LD [I], Vx - Store registers V0 through Vx in memory starting at location I.
-					for (int i = 0; i < cpu->V[X(cpu->opcode)]; i++) {
+					for (int i = 0; i < X(cpu->opcode) + 1; i++) {
 						cpu->memory[cpu->I + i] = cpu->V[i];
 					}
-
+					cpu->I = cpu->I + X(cpu->opcode) + 1;
 					cpu->pc += 2;
 				break;
 
 				case 0x0065: //FX6: Ld Vx, [I] - Read registers V0 through Vx from memory starting at location I.
-					for (int i = 0; i < cpu->V[X(cpu->opcode)]; i ++) {
+					for (int i = 0; i < X(cpu->opcode) + 1; i++) {
 						cpu->V[i] = cpu->memory[cpu->I + i];
 					}
-
+					cpu->I = cpu->I + X(cpu->opcode) + 1;
 					cpu->pc += 2;
 				break;
 

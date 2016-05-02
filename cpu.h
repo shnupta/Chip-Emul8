@@ -15,7 +15,7 @@ typedef struct {
 	uint16_t I; //index register
 	uint16_t pc; //program counter
 
-	uint8_t gfx[64 * 32]; //pixels of screen
+	uint8_t gfx[64][32]; //pixels of screen
 
 	uint8_t delay_timer;
 	uint8_t sound_timer;
@@ -23,7 +23,9 @@ typedef struct {
 	uint16_t stack[16];
 	uint16_t sp;
 
-	uint8_t key[16]; //hex keypad
+	uint8_t keys[16]; //hex keypad
+
+	unsigned char key;
 
 	bool draw_flag;
 

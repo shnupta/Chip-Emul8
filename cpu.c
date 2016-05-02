@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <SDL2_mixer/SDL_mixer.h>
+
+Mix_Music * beep_sound = NULL;
+Mix_Chunk * beep_scratch = NULL;
 
 unsigned char font_set[80] =
 {
@@ -25,30 +29,12 @@ unsigned char font_set[80] =
   0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-unsigned char key_map[16] = {
-    SDL_SCANCODE_1,
-    SDL_SCANCODE_2,
-    SDL_SCANCODE_3,
-    SDL_SCANCODE_4,
-    SDL_SCANCODE_Q,
-    SDL_SCANCODE_W,
-    SDL_SCANCODE_E,
-    SDL_SCANCODE_R,
-    SDL_SCANCODE_A,
-    SDL_SCANCODE_S,
-    SDL_SCANCODE_D,
-    SDL_SCANCODE_F,
-    SDL_SCANCODE_Z,
-    SDL_SCANCODE_X,
-    SDL_SCANCODE_C,
-    SDL_SCANCODE_V
-};
 
 void initialise_cpu(chip8 * cpu) {
 	memset(cpu->memory, 0, 4096); //reset memory
 	memset(cpu->V, 0, 16); //reset registers
 	memset(cpu->stack, 0, 16); //reset stack
-	memset(cpu->key, 0, 16); //reset keys
+	memset(cpu->keys, 0, 16); //reset keys
 	//defaults
 	cpu->I = 0;
 	cpu->pc = 0x200;
@@ -66,6 +52,21 @@ void initialise_cpu(chip8 * cpu) {
 
 	srand(time(NULL)); //reset random seed
 
+
+
+	if(Mix_OpenAudio(441000, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		log_err("SDL_mixer error.");
+	}
+
+
+	beep_sound = Mix_LoadMUS("beep.wav");
+
+	if(beep_sound == NULL) {
+		log_err("Loading of sound failed.");
+	}
+
+
+
 }
 
 
@@ -80,7 +81,7 @@ bool load_rom(chip8 * cpu, const char *rom_name) {
 	unsigned long buffer_size = ftell(file);
 	rewind(file);
 
-	log_info("Read %lu bytes from %s.", buffer_size, rom_name);
+	log_info("Read %lu bytes from %s", buffer_size, rom_name);
 
 	char *buffer = (char *) malloc((buffer_size + 1) * sizeof(char)); //allocate memory for buffer
 	fread(buffer, buffer_size, 1, file);
@@ -95,12 +96,13 @@ bool load_rom(chip8 * cpu, const char *rom_name) {
 
 
 void emulate_cycle(chip8 * cpu) {
+
+	update_timers(cpu);
 	//fetch opcode
 	cpu->opcode = cpu->memory[cpu->pc] << 8 | cpu->memory[cpu->pc + 1];
 	
 	decode_opcode(cpu);
 
-	update_timers(cpu);
 
 }
 
@@ -119,9 +121,14 @@ void update_timers(chip8 * cpu) {
 	if(cpu->sound_timer > 0) {
 		if(cpu->sound_timer == 1) {
 			printf("BEEP\n");
+			Mix_PlayMusic(beep_sound, -1);
 			--cpu->sound_timer;
 		}
 	}
+}
+
+void handle_input(chip8 * cpu, unsigned char key) {
+	cpu->key = key;
 }
 
 
