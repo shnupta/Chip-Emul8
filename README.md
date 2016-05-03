@@ -14,10 +14,14 @@
 
 <h2>How To Use It</h2>
 <p>Currently I've only tested this on Mac and I believe you have to download GLUT on other OSs. First off, download the repo and open it up. Navigate to the directory and run</p>
+<h3>Mac</h3>
 ```make build```
 <p>After that, to use the emulator type</p>
 ```./ch8 ./<path to your chip8 rom>```
 <p>Controls... I'm not exactly sure as to the controls for all the games but the keys will be one of: 1, 2, 3, 4, q, w, e, r, t, y, a, s, d, f, z, x, c, v. To quit the emulator press esc.</p>
+
+<h3>Windows</h3>
+<p>To be done..</p>
 
 <h5>Feel free to use the code so long as you give credit to me.</h5>
 
