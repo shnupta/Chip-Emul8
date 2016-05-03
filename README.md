@@ -12,6 +12,10 @@
 <p>The only thing I have planned for now is to implement sounds, that's it.</p>
 
 
+<h2>Screenshots</h2>
+<h3>Mac</h3>
+<img src="Screenshots/Pong-Chip8 Mac"/>
+
 <h2>How To Use It</h2>
 <p>Currently I've only tested this on Mac and I believe you have to download GLUT on other OSs. First off, download the repo and open it up. Navigate to the directory and run</p>
 <h3>Mac</h3>
