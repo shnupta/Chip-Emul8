@@ -4,10 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <SDL2_mixer/SDL_mixer.h>
-
-Mix_Music * beep_sound = NULL;
-Mix_Chunk * beep_scratch = NULL;
 
 unsigned char font_set[80] =
 {
@@ -53,20 +49,6 @@ void initialise_cpu(chip8 * cpu) {
 	srand(time(NULL)); //reset random seed
 
 
-
-	if(Mix_OpenAudio(441000, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-		log_err("SDL_mixer error.");
-	}
-
-
-	beep_sound = Mix_LoadMUS("beep.wav");
-
-	if(beep_sound == NULL) {
-		log_err("Loading of sound failed.");
-	}
-
-
-
 }
 
 
@@ -83,12 +65,17 @@ bool load_rom(chip8 * cpu, const char *rom_name) {
 
 	log_info("Read %lu bytes from %s", buffer_size, rom_name);
 
+	
+
 	char *buffer = (char *) malloc((buffer_size + 1) * sizeof(char)); //allocate memory for buffer
 	fread(buffer, buffer_size, 1, file);
+	
+	
 
 	for(int i = 0; i < buffer_size; i++) {
 		cpu->memory[512 + i] = buffer[i];
 	}
+
 
 	return true;
 	
@@ -96,6 +83,7 @@ bool load_rom(chip8 * cpu, const char *rom_name) {
 
 
 void emulate_cycle(chip8 * cpu) {
+
 
 	update_timers(cpu);
 	//fetch opcode
@@ -121,7 +109,6 @@ void update_timers(chip8 * cpu) {
 	if(cpu->sound_timer > 0) {
 		if(cpu->sound_timer == 1) {
 			printf("BEEP\n");
-			Mix_PlayMusic(beep_sound, -1);
 			--cpu->sound_timer;
 		}
 	}

@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <SDL2/SDL.h>
 
 typedef struct {
 	uint16_t opcode; //an opcode is two bytes
@@ -41,5 +40,6 @@ bool load_rom(chip8 * cpu, const char *name);
 void emulate_cycle(chip8 * cpu);
 void clear_screen(chip8 *cpu);
 void update_timers(chip8 * cpu);
+void handle_input(chip8 *cpu, unsigned char key);
 
 #endif

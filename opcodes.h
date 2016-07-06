@@ -305,6 +305,7 @@ void decode_opcode(chip8 * cpu) {
 			exit(1);
 
 	}
+
 }
 
 

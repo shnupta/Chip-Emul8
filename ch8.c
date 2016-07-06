@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include "cpu.h"
 #include "dbg.h"
 
@@ -35,6 +35,8 @@ int main(int argc, char const *argv[])
 
 	glutInit(&argc, argv); //initialise glut
 
+	
+
 	//initialise display and window
 
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
@@ -42,11 +44,15 @@ int main(int argc, char const *argv[])
 	glutInitWindowSize(640, 320);
 	glutCreateWindow("Chip-Emul8");
 
+	
+
 	initGL();
 
 	//handle key presses and releases
 	glutKeyboardFunc(handle_key_press);
 	glutKeyboardUpFunc(handle_key_release);
+
+	
 
 	//draw function
 	glutDisplayFunc(render);
@@ -54,9 +60,12 @@ int main(int argc, char const *argv[])
 	//idle function (to redraw)
 	glutIdleFunc(idle);
 
+
 	glutMainLoop();
 
 	return 0;
+
+	
 }
 
 void handle_key_press(unsigned char key, int x, int y) {

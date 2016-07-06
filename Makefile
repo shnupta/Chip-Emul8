@@ -1,5 +1,4 @@
-CFLAGS=-Wall -g -I/System/Library/Frameworks/GLUT.framework/Headers -I/System/Library/Frameworks/SDL2_mixer.framework/Headers
-LDFLAGS=-framework OpenGL	-framework	GLUT  -framework SDL2_mixer
+CFLAGS=-Wall -g -lGL -lGLU -lglut
 
 
 build: ch8
