@@ -27,6 +27,9 @@
 <h3>Windows</h3>
 <p>To be done..</p>
 
+<h3>Linux</h3>
+<p>In the process of providing a linux source.</p>
+
 <h5>Feel free to use the code so long as you give credit to me.</h5>
 
 <h3>Here are some useful links:</h3>
