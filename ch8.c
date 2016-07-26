@@ -155,8 +155,8 @@ void render() {
 	emulate_cycle(&cpu);
 
 	int i, j;
-	for(i = 0; i < 640; i++) {
-		for(j = 0; j < 320; j++) {
+	for(i = 0; i < 64; i++) {
+		for(j = 0; j < 32; j++) {
 			if(cpu.gfx[i][j] == 1) {
 				draw_square((float)(i * 10), (float) (j * 10));
 			}
