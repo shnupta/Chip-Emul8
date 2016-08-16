@@ -31,7 +31,7 @@
 <p>To be done..</p>
 
 <h3>Linux</h3>
-<p>In the process of providing a linux source.</p>
+<p>Exact same as Mac.</p>
 
 <h5>Feel free to use the code so long as you give credit to me.</h5>
 
