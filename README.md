@@ -61,4 +61,3 @@
 <p>https://github.com/bryangarza/chip8</p>
 <p>https://github.com/prophittcorey/iC8</p>
 
-<h5>Read my blog to find out more about the project: http://caseywilliams.tk/blog</h5>
